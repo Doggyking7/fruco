@@ -3,43 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Truco Venezolano</title>
+    <title>Mi Truco Venezolano</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #2c3e50;
             color: white;
-            text-align: center;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
         }
         .game-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            box-sizing: border-box;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            width: 800px;
+            height: 600px;
+            position: relative;
         }
         .table {
-            background-color: #006400; /* Verde oscuro */
-            border: 5px solid #004d00;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            padding: 20px;
-            border-radius: 10px;
-            flex-grow: 1;
+            background-color: #228B22; /* Verde bosque */
+            border: 10px solid #8B4513; /* Marrón madera */
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 100%;
+            height: 100%;
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background-image: url('ruta/a/tu/logo.png'); /* Reemplaza con la ruta a tu logo */
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.3;
         }
         .player-hand, .opponent-hand, .played-cards {
             display: flex;
             justify-content: center;
             margin: 10px 0;
-            min-height: 140px; /* Espacio suficiente para las cartas */
+            min-height: 140px;
         }
         .card {
             width: 80px;
@@ -53,24 +65,42 @@
             justify-content: center;
             font-size: 18px;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.05);
         }
         .card.selected {
             border: 2px solid yellow;
+            transform: scale(1.05);
+        }
+        .actions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .actions button {
-            margin: 10px;
+            margin: 0 10px;
             padding: 10px 20px;
             font-size: 16px;
+            cursor: pointer;
+        }
+        .score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
         .score p {
             font-size: 18px;
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>Truco Venezolano</h1>
         <div class="table">
+            <div class="logo"></div>
             <div class="opponent-hand" id="opponent-hand"></div>
             <div class="played-cards" id="played-cards"></div>
             <div class="player-hand" id="player-hand"></div>
@@ -135,18 +165,56 @@
             }
 
             let baraja = crearBaraja();
-            console.log('Baraja creada con', baraja.length, 'cartas');
             baraja = mezclarBaraja(baraja);
             let { jugador, oponente, barajaRestante } = repartirCartas(baraja);
-            console.log('Mano del jugador:', jugador);
-            console.log('Mano del oponente:', oponente);
 
             renderizarCartas(jugador, 'player-hand');
             renderizarCartas(oponente, 'opponent-hand', true);
 
-            // Verificar contenido después de renderizar
-            console.log('Contenido de player-hand:', document.getElementById('player-hand').innerHTML);
-            console.log('Contenido de opponent-hand:', document.getElementById('opponent-hand').innerHTML);
+            let cartaSeleccionada = null;
+
+            document.getElementById('player-hand').addEventListener('click', (e) => {
+                if (e.target.classList.contains('card')) {
+                    const cartas = document.querySelectorAll('#player-hand .card');
+                    cartas.forEach(carta => carta.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                    cartaSeleccionada = parseInt(e.target.dataset.index);
+                }
+            });
+
+            document.getElementById('play-card').addEventListener('click', () => {
+                if (cartaSeleccionada !== null) {
+                    const carta = jugador[cartaSeleccionada];
+                    const playedCards = document.getElementById('played-cards');
+                    const cartaDiv = document.createElement('div');
+                    cartaDiv.classList.add('card');
+                    cartaDiv.textContent = `${carta.valor} de ${carta.palo}`;
+                    playedCards.appendChild(cartaDiv);
+                    
+                    jugador.splice(cartaSeleccionada, 1);
+                    renderizarCartas(jugador, 'player-hand');
+                    cartaSeleccionada = null;
+
+                    if (oponente.length > 0) {
+                        const cartaOponente = oponente.shift();
+                        const cartaOponenteDiv = document.createElement('div');
+                        cartaOponenteDiv.classList.add('card');
+                        cartaOponenteDiv.textContent = `${cartaOponente.valor} de ${cartaOponente.palo}`;
+                        playedCards.appendChild(cartaOponenteDiv);
+                        renderizarCartas(oponente, 'opponent-hand', true);
+                    }
+                } else {
+                    alert('Por favor, selecciona una carta primero.');
+                }
+            });
+
+            document.getElementById('truco').addEventListener('click', () => {
+                alert('¡Truco declarado! (Funcionalidad por implementar)');
+            });
+
+            document.getElementById('envido').addEventListener('click', () => {
+                alert('¡Envido declarado! (Funcionalidad por implementar)');
+            });
         });
     </script>
 </body>
