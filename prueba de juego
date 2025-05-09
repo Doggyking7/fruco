@@ -1,1 +1,133 @@
-here
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truco Venezolano</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+        }
+        .game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .table {
+            background-color: #16a085;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 300px;
+            position: relative;
+        }
+        .player-hand, .opponent-hand, .played-cards {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .card {
+            width: 80px;
+            height: 120px;
+            background-color: white;
+            color: black;
+            margin: 0 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .card.selected {
+            border: 2px solid yellow;
+        }
+        .actions button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .score p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Truco Venezolano</h1>
+        <div class="table">
+            <div class="opponent-hand" id="opponent-hand"></div>
+            <div class="played-cards" id="played-cards"></div>
+            <div class="player-hand" id="player-hand"></div>
+        </div>
+        <div class="actions">
+            <button id="play-card">Jugar Carta</button>
+            <button id="truco">Truco</button>
+            <button id="envido">Envido</button>
+        </div>
+        <div class="score">
+            <p>Puntuación Jugador: <span id="player-score">0</span></p>
+            <p>Puntuación Oponente: <span id="opponent-score">0</span></p>
+        </div>
+    </div>
+    <script>
+        const palos = ['oro', 'copa', 'espada', 'basto'];
+        const valores = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
+
+        // Crear la baraja
+        function crearBaraja() {
+            const baraja = [];
+            palos.forEach(palo => {
+                valores.forEach(valor => {
+                    baraja.push({ valor, palo });
+                });
+            });
+            return baraja;
+        }
+
+        // Mezclar la baraja
+        function mezclarBaraja(baraja) {
+            for (let i = baraja.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [baraja[i], baraja[j]] = [baraja[j], baraja[i]];
+            }
+            return baraja;
+        }
+
+        // Repartir cartas
+        function repartirCartas(baraja) {
+            const jugador = baraja.splice(0, 3);
+            const oponente = baraja.splice(0, 3);
+            return { jugador, oponente, baraja };
+        }
+
+        // Renderizar cartas
+        function renderizarCartas(mano, elementoId, ocultas = false) {
+            const elemento = document.getElementById(elementoId);
+            elemento.innerHTML = '';
+            mano.forEach((carta, index) => {
+                const cartaDiv = document.createElement('div');
+                cartaDiv.classList.add('card');
+                cartaDiv.dataset.index = index;
+                if (ocultas) {
+                    cartaDiv.textContent = '??';
+                } else {
+                    cartaDiv.textContent = `${carta.valor} de ${carta.palo}`;
+                }
+                elemento.appendChild(cartaDiv);
+            });
+        }
+
+        // Inicializar juego
+        let baraja = crearBaraja();
+        baraja = mezclarBaraja(baraja);
+        let { jugador, oponente, barajaRestante } = repartirCartas(baraja);
+        let cartaSeleccionada = null;
+
+        renderizarCartas(jugador, 'player-hand');
+        renderizarCartas(oponente, 'opponent-hand', true);
+
+        // Seleccionar
