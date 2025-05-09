@@ -12,23 +12,25 @@
             text-align: center;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Evita el deslizamiento vertical */
-            height: 100vh; /* Limita la altura al viewport */
+            overflow: hidden;
+            height: 100vh;
         }
         .game-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
-            height: 100%; /* Se ajusta a la altura del body */
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
         .table {
-            background-color: #16a085;
+            background-color: #006400; /* Verde oscuro */
+            border: 5px solid #004d00;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
             padding: 20px;
             border-radius: 10px;
-            flex-grow: 1; /* Usa el espacio disponible */
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -37,6 +39,7 @@
             display: flex;
             justify-content: center;
             margin: 10px 0;
+            min-height: 140px; /* Espacio suficiente para las cartas */
         }
         .card {
             width: 80px;
@@ -87,7 +90,6 @@
             const palos = ['oro', 'copa', 'espada', 'basto'];
             const valores = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
 
-            // Crear la baraja
             function crearBaraja() {
                 const baraja = [];
                 palos.forEach(palo => {
@@ -98,7 +100,6 @@
                 return baraja;
             }
 
-            // Mezclar la baraja
             function mezclarBaraja(baraja) {
                 for (let i = baraja.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -107,86 +108,45 @@
                 return baraja;
             }
 
-            // Repartir cartas
             function repartirCartas(baraja) {
                 const jugador = baraja.splice(0, 3);
                 const oponente = baraja.splice(0, 3);
                 return { jugador, oponente, baraja };
             }
 
-            // Renderizar cartas
             function renderizarCartas(mano, elementoId, ocultas = false) {
                 const elemento = document.getElementById(elementoId);
+                if (!elemento) {
+                    console.error(`Elemento con ID ${elementoId} no encontrado.`);
+                    return;
+                }
                 elemento.innerHTML = '';
+                if (!mano || mano.length === 0) {
+                    console.log(`Mano vacía para ${elementoId}`);
+                    return;
+                }
                 mano.forEach((carta, index) => {
                     const cartaDiv = document.createElement('div');
                     cartaDiv.classList.add('card');
                     cartaDiv.dataset.index = index;
-                    if (ocultas) {
-                        cartaDiv.textContent = '??';
-                    } else {
-                        cartaDiv.textContent = `${carta.valor} de ${carta.palo}`;
-                    }
+                    cartaDiv.textContent = ocultas ? '??' : `${carta.valor} de ${carta.palo}`;
                     elemento.appendChild(cartaDiv);
                 });
             }
 
-            // Inicializar juego
             let baraja = crearBaraja();
+            console.log('Baraja creada con', baraja.length, 'cartas');
             baraja = mezclarBaraja(baraja);
             let { jugador, oponente, barajaRestante } = repartirCartas(baraja);
-            let cartaSeleccionada = null;
-
             console.log('Mano del jugador:', jugador);
             console.log('Mano del oponente:', oponente);
 
             renderizarCartas(jugador, 'player-hand');
             renderizarCartas(oponente, 'opponent-hand', true);
 
-            // Seleccionar carta
-            document.getElementById('player-hand').addEventListener('click', (e) => {
-                if (e.target.classList.contains('card')) {
-                    const cartas = document.querySelectorAll('#player-hand .card');
-                    cartas.forEach(carta => carta.classList.remove('selected'));
-                    e.target.classList.add('selected');
-                    cartaSeleccionada = parseInt(e.target.dataset.index);
-                }
-            });
-
-            // Jugar carta
-            document.getElementById('play-card').addEventListener('click', () => {
-                if (cartaSeleccionada !== null) {
-                    const carta = jugador[cartaSeleccionada];
-                    const playedCards = document.getElementById('played-cards');
-                    const cartaDiv = document.createElement('div');
-                    cartaDiv.classList.add('card');
-                    cartaDiv.textContent = `${carta.valor} de ${carta.palo}`;
-                    playedCards.appendChild(cartaDiv);
-                    
-                    jugador.splice(cartaSeleccionada, 1);
-                    renderizarCartas(jugador, 'player-hand');
-                    cartaSeleccionada = null;
-
-                    // Turno del oponente (simple IA)
-                    if (oponente.length > 0) {
-                        const cartaOponente = oponente.shift();
-                        const cartaOponenteDiv = document.createElement('div');
-                        cartaOponenteDiv.classList.add('card');
-                        cartaOponenteDiv.textContent = `${cartaOponente.valor} de ${cartaOponente.palo}`;
-                        playedCards.appendChild(cartaOponenteDiv);
-                        renderizarCartas(oponente, 'opponent-hand', true);
-                    }
-                }
-            });
-
-            // Botones de truco y envido (funcionalidad placeholder)
-            document.getElementById('truco').addEventListener('click', () => {
-                alert('¡Truco declarado! (Funcionalidad por implementar)');
-            });
-
-            document.getElementById('envido').addEventListener('click', () => {
-                alert('¡Envido declarado! (Funcionalidad por implementar)');
-            });
+            // Verificar contenido después de renderizar
+            console.log('Contenido de player-hand:', document.getElementById('player-hand').innerHTML);
+            console.log('Contenido de opponent-hand:', document.getElementById('opponent-hand').innerHTML);
         });
     </script>
 </body>
