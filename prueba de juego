@@ -22,8 +22,8 @@
             position: relative;
         }
         .table {
-            background-color: #228B22; /* Verde bosque */
-            border: 10px solid #8B4513; /* Marrón madera */
+            background-color: #228B22;
+            border: 10px solid #8B4513;
             border-radius: 20px;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
             width: 100%;
@@ -42,7 +42,6 @@
             transform: translate(-50%, -50%);
             width: 200px;
             height: 200px;
-            background-image: url('ruta/a/tu/logo.png'); /* Reemplaza con la ruta a tu logo */
             background-size: contain;
             background-repeat: no-repeat;
             opacity: 0.3;
@@ -146,15 +145,7 @@
 
             function renderizarCartas(mano, elementoId, ocultas = false) {
                 const elemento = document.getElementById(elementoId);
-                if (!elemento) {
-                    console.error(`Elemento con ID ${elementoId} no encontrado.`);
-                    return;
-                }
                 elemento.innerHTML = '';
-                if (!mano || mano.length === 0) {
-                    console.log(`Mano vacía para ${elementoId}`);
-                    return;
-                }
                 mano.forEach((carta, index) => {
                     const cartaDiv = document.createElement('div');
                     cartaDiv.classList.add('card');
@@ -190,7 +181,7 @@
                     cartaDiv.classList.add('card');
                     cartaDiv.textContent = `${carta.valor} de ${carta.palo}`;
                     playedCards.appendChild(cartaDiv);
-                    
+
                     jugador.splice(cartaSeleccionada, 1);
                     renderizarCartas(jugador, 'player-hand');
                     cartaSeleccionada = null;
